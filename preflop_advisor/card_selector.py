@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import tkinter as tk
-# from tkinter import ttk
+#import tkinter.ttk as ttk
 from configparser import ConfigParser
 
 NUM_ROWS = 13
@@ -10,10 +10,11 @@ RANK_DIC = {0: "A", 1: "K", 2: "Q", 3: "J", 4: "T", 5: "9",
             6: "8", 7: "7", 8: "6", 9: "5", 10: "4", 11: "3", 12: "2"}
 SUIT_DIC = {0: "h", 1: "c", 2: "s", 3: "d"}
 SUIT_SIGN_DIC = {0: "\u2665", 1: "\u2663", 2: "\u2660", 3: "\u2666"}
-SUIT_COLORS = {"h": "red2", "d": "SteelBlue1",
+SUIT_COLORS = {"h": "red", "d": "SteelBlue1",
                "c": "SpringGreen2", "s": "gray50"}
 SELECTED_SUIT_COLORS = {"h": "red4", "d": "SteelBlue4",
                         "c": "SpringGreen4", "s": "gray30"}
+BUTTON_FONT = ("Helvetica", "8")
 
 
 class CardSelector(tk.Frame):
@@ -42,7 +43,9 @@ class CardSelector(tk.Frame):
         button = tk.Button(
             self, text=RANK_DIC[row] + SUIT_SIGN_DIC[column], command=self.on_button_clicked(row, column))
         button.config(background=self.color_dict[SUIT_DIC[column]], height=self.button_height,
-                      width=self.button_width, padx=self.button_pad, pady=self.button_pad)
+                      width=self.button_width,
+                      font=BUTTON_FONT,
+                      padx=self.button_pad, pady=self.button_pad)
         button.grid(row=row, column=column)
         return button
 
@@ -99,9 +102,11 @@ class CardSelector(tk.Frame):
 
 def test(root):
     configs = ConfigParser()
-    configs.read("config.ini")
+    configs.read("../config.ini")
     card_selector_settings = configs["CardSelector"]
-    card_selector = CardSelector(root, card_selector_settings)
+    update_output = print("Cards")
+    card_selector = CardSelector(
+        root, card_selector_settings, update_output).grid(column=0, row=0)
 
 
 if (__name__ == '__main__'):

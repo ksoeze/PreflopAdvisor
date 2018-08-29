@@ -81,10 +81,12 @@ class TreeSelector(tk.Frame):
 
 def test(root):
     configs = ConfigParser()
-    configs.read("config.ini")
+    configs.read("../config.ini")
     settings = configs["TreeSelector"]
     infos = configs["TreeInfos"]
-    tree_selector = TreeSelector(root, settings, infos)
+    action = "do something"
+    tree_selector = TreeSelector(
+        root, settings, infos, action).grid(row=0, column=0)
 
 
 if (__name__ == '__main__'):

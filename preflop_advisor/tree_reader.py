@@ -50,13 +50,18 @@ class TreeReader():
         row.append({"isInfo": True, "Text": "X"})
         row.append({"isInfo": True, "Text": "FI"})
         for position in self.position_list:
-            row.append({"isInfo": True, "Text": position})
+            row.append({"isInfo": True, "Text": "vs " + position})
         self.results.append(row)
 
         for row_pos in self.position_list:
             row = [{"isInfo": True, "Text": row_pos}]
-            row.append(
-                {"isInfo": False, "Results": self.action_processor.get_results(self.hand, [], row_pos)})
+            if row_pos != "BB":
+                row.append(
+                    {"isInfo": False, "Results": self.action_processor.get_results(self.hand, [], row_pos)})
+            else:
+                row.append(
+                    {"isInfo": False, "Results": self.action_processor.get_results(self.hand, [("SB", "Call")], row_pos)})
+
             for column_pos in self.position_list:
                 row.append(
                     {"isInfo": False, "Results": self.get_vs_first_in(

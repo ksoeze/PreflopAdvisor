@@ -30,18 +30,20 @@ class MainWindow:
         self.position_selector = PositionSelector(
             self.card_selector_position_frame, self.configs["PositionSelector"], self.update_output_frame
         )
+        self.output = OutputFrame(
+            self.output_frame, self.configs["Output"], self.configs["TreeReader"])
 
         self.grid_frames()
 
     def grid_frames(self):
         self.input_frame.grid(row=0, column=0)
-        self.output_frame.grid(row=0, column=1)
+        self.output_frame.grid(row=0, column=1, padx=100)
 
         self.card_selector_position_frame.grid(row=0, column=0, sticky='W')
-        self.tree_selector.grid(row=1, column=0)
+        self.tree_selector.grid(row=1, column=0, columnspan=2)
 
         self.card_selector.grid(row=0, column=0)
-        self.position_selector.grid(row=0, column=1)
+        self.position_selector.grid(row=0, column=1, sticky="S")
 
     def update_output_frame(self):
         tree_infos = self.tree_selector.get_tree_infos()
@@ -49,9 +51,7 @@ class MainWindow:
         position = self.position_selector.get_position()
         hand = self.card_selector.get_hand()
 
-        output = OutputFrame(
-            self.output_frame, self.configs["Output"], self.configs["TreeReader"])
-        output.redraw_output_frame(hand, position, tree_infos)
+        self.output.update_output_frame(hand, position, tree_infos)
 
 
 if (__name__ == '__main__'):
