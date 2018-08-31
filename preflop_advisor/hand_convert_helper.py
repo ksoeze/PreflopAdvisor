@@ -10,11 +10,34 @@ SUITS = list("cdhs")
 # Converts 4 Card Hand like "AsAcTh3d" to monker tree format
 # TODO implement NL convertion (should be simpler than omaha / o8)
 
-
 def convert_hand(hand):
+    hand = hand.replace(" ","")
+    if len(hand) == 8:
+        return convert_omaha_hand(hand)
+    elif len(hand) == 4:
+        return convert_holdem_hand(hand)
+    logging.error(
+            "Hand: {} cannot be converted...wrong length".format(hand))
+    return hand
+
+def convert_holdem_hand(hand):
+    if len(hand) != 4:
+        logging.error(
+            "NL Hand: {} cannot be converted...wrong length".format(hand))
+    ranks = [hand[0],hand[2]]
+    suits = [hand[1],hand[3]]
+    ranks.sort(key=lambda x: RANK_ORDER[x],reverse=True)
+    if ranks[0] == ranks[1]:
+        return "{}{}".format(ranks[0],ranks[0])
+    if suits[0] == suits[1]:
+        return "{}{}{}".format(ranks[0],ranks[1],"s")
+    else:
+        return "{}{}{}".format(ranks[0],ranks[1],"o")
+    
+def convert_omaha_hand(hand):
     if len(hand) != 8:
         logging.error(
-            "Hand: {} cannot be converted...wrong length".format(hand))
+            "Omaha Hand: {} cannot be converted...wrong length".format(hand))
         return hand
     ranks = [hand[0], hand[2], hand[4], hand[6]]
     suits = [hand[1], hand[3], hand[5], hand[7]]
@@ -67,7 +90,7 @@ def convert_hand(hand):
     if cards_two_suited:
         for item in cards_two_suited:
             item.sort(key=lambda x: RANK_ORDER[x[0]])
-        cards_two_suited.sort(key=lambda x: RANK_ORDER[x[1][0]])  # NOT SURE
+        cards_two_suited.sort(key=lambda x: (RANK_ORDER[x[1][0]],RANK_ORDER[x[0][0]]))
         for item in cards_two_suited:
             return_hand += "(" + item[0][0] + item[1][0] + ")"
     if cards_three_suited:
@@ -81,3 +104,10 @@ def convert_hand(hand):
             return_hand += card[0]
         return_hand += ")"
     return return_hand
+
+
+def test():
+    print(convert_hand("Ah8h"))
+
+if (__name__ == '__main__'):
+    test()

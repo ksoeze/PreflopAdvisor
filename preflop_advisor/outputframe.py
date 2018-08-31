@@ -9,7 +9,7 @@ from output_objects import TableEntry
 
 RESULT_ROWS = 7
 RESULT_COLUMNS = 8
-RESULT_HEIGHT = 100
+RESULT_HEIGHT = 80
 RESULT_WIDTH = 150
 
 INFO_FONT = ("Helvetica", 16)
@@ -25,7 +25,9 @@ class OutputFrame(tk.Frame):
         self.info_frame = tk.Frame(root)
         self.general_infos = tk.StringVar()
         self.general_infos_label = tk.Label(
-            self.info_frame, textvariable=self.general_infos, font=INFO_FONT).grid(row=0, column=0)
+            self.info_frame,
+            textvariable=self.general_infos,
+            font=INFO_FONT).grid(row=0, column=0)
 
         self.update_info_frame(hand="", position="", treeinfo="")
 
@@ -39,14 +41,15 @@ class OutputFrame(tk.Frame):
         self.output_frame.grid(row=1, column=0)
 
     def update_info_frame(self, hand, position, treeinfo):
-        text = "Hand: " + hand + " Position: " + position + " " + treeinfo
+        text = "Hand: " + hand + "   Position: " + position + "   " + treeinfo
         self.general_infos.set(text)
 
     def update_output_frame(self, hand, position, tree):
-        self.update_info_frame(hand, position, "")
+        tree_infos = "{}-max {}bb {} {}".format(tree["plrs"],tree["bb"],tree["game"],tree["infos"]) 
+        self.update_info_frame(hand, position, tree_infos)
         tree_reader = TreeReader(hand, position, tree,
                                  self.tree_reader_configs)
-        tree_reader.fill_default_results()
+        #tree_reader.fill_default_results()
         results = tree_reader.get_results()
 
         for row in range(RESULT_ROWS):
@@ -84,7 +87,8 @@ class OutputFrame(tk.Frame):
         if len(results) == 0:
             return []
 
-        fold_ev = results[0][2]
+        
+        fold_ev = results[0][2] if self.output_configs["AdjustFoldEV"] == "yes" else 0
         results = results[1:]
 
         if len(results) == 0:
@@ -97,22 +101,6 @@ class OutputFrame(tk.Frame):
                 results[1][1] * 100), "{0:.02f}".format((results[1][2] - fold_ev) / 2000)]
             return [new_entry1, new_entry2]
         return [new_entry1]
-
-    def print_infos(self, root, results):
-        # print(results)
-        if results["isInfo"]:
-            tk.Label(root, text=results["Text"]).grid(column=0, row=0)
-        else:
-            for column in range(len(results["Results"])):
-                frame = tk.Frame(root)
-                self.print_result(frame, results["Results"][column])
-                frame.grid(row=0, column=column)
-
-    def print_result(self, root, result):
-        text = "{0} \n {1:.0f} \n ({2:.02f})".format(
-            result[0], result[1] * 100, result[2] / 2000)
-        tk.Label(root, text=text).pack()
-
 
 def test(root):
     configs = ConfigParser()

@@ -7,7 +7,6 @@ from configparser import ConfigParser
 
 class PositionSelector(tk.Frame):
     def __init__(self, root, position_config, update_output):
-        #self.root = root
         tk.Frame.__init__(self, root)
         self.update_output = update_output
         self.position_list = position_config["PositionList"].split(",")
@@ -28,7 +27,8 @@ class PositionSelector(tk.Frame):
         self.current_position = self.default_position
 
         for item in self.position_inactive_list:
-            self.deactivate_button(self.convert_position_name_to_index(item))
+            if item in self.position_list:
+                self.deactivate_button(self.convert_position_name_to_index(item))
         self.select_button(self.current_position)
 
     def create_button(self, row):
@@ -37,7 +37,8 @@ class PositionSelector(tk.Frame):
         button.config(height=self.button_height,
                       width=self.button_width,
                       bg=self.background,
-                      font=(self.font, self.fontsize), padx=self.button_pad, pady=self.button_pad)
+                      font=(self.font, self.fontsize),
+                      padx=self.button_pad, pady=self.button_pad)
         button.grid(row=row)
         return button
 
@@ -67,16 +68,21 @@ class PositionSelector(tk.Frame):
     def get_position(self):
         return self.position_list[self.current_position]
 
-    def set_active_positions(self, active_position_list):
-        if self.get_position() not in active_position_list:
-            self.current_position = self.default_position
+    def update_active_positions(self, num_players):
+        active_positions = list(reversed(self.position_list))
+        active_positions=[active_positions[-1]] + active_positions[:num_players]
+
+        if self.get_position() not in active_positions:
+             self.process_button_clicked(self.default_position)
+             self.current_position = self.default_position
+            
         for position in self.position_list:
-            if position in active_position_list:
-                self.activate_button(
-                    self.convert_position_name_to_index(position))
+            if position in active_positions and position not in self.position_inactive_list:
+                index=self.convert_position_name_to_index(position)
+                self.activate_button(index)
             else:
-                self.deactivate_button(
-                    self.convert_position_name_to_index(position))
+                self.deactivate_button(self.convert_position_name_to_index(position))
+            
 
     def convert_position_name_to_index(self, name):
         return self.position_list.index(name)

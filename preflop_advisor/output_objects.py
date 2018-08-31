@@ -37,9 +37,15 @@ class TableEntry(tk.Frame):
     def set_result_label(self, results):
         if len(results) == 1:
             self.right_results.set(self.convert_result_to_str(results[0]))
+            if int(results[0][1]) > 50:
+                self.label_right.config(background="linen")
         elif len(results) == 2:
             self.left_results.set(self.convert_result_to_str(results[0]))
+            if int(results[0][1]) > 50:
+                self.label_left.config(background="linen")
             self.right_results.set(self.convert_result_to_str(results[1]))
+            if int(results[1][1]) > 50:
+                self.label_right.config(background="linen")
 
         self.label_left.grid(row=0, column=0, sticky="we", padx=1)
         self.label_right.grid(row=0, column=1, sticky="we", padx=1)
@@ -58,6 +64,11 @@ class TableEntry(tk.Frame):
         self.info_text.set("")
         self.left_results.set("")
         self.right_results.set("")
+
+        default_bg = self.label.cget('bg')
+        self.label_right.config(background=default_bg)
+        self.label_left.config(background=default_bg)
+        # self.label.config(background="#40E0D0")
 
 
 def test(root):
@@ -79,14 +90,15 @@ def test(root):
     table_entry.clear_entry()
     table_entry.set_description_label(("Helvetica", "15"), "UTG")
     table_entry.grid(row=2, column=0)
-    ttk.Separator(root).grid(row=1, column=0, columnspan=5, sticky="ew")
+    ttk.Separator(root).grid(row=1, column=0,
+                             columnspan=5, sticky="ew")
     ttk.Separator(root, orient=tk.VERTICAL).grid(
         row=0, column=1, rowspan=3, sticky="sn")
     table_entry1 = TableEntry(root, 100, 100)
     table_entry1.clear_entry()
     table_entry1.set_result_label([[" ", "100", "+23"]])
     table_entry1.grid(row=2, column=2)
-    #table_entry1.set_description_label(("Helvetica", "15"), "UTG")
+    # table_entry1.set_description_label(("Helvetica", "15"), "UTG")
     ttk.Separator(root, orient=tk.VERTICAL).grid(
         row=0, column=3, rowspan=3, sticky="sn")
     table_entry2 = TableEntry(root, 100, 100)

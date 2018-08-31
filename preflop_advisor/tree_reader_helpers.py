@@ -98,12 +98,12 @@ class ActionProcessor():
         except EnvironmentError:
             logging.error("Could not find File: {}".format(filename))
             logging.error("ActionSequence is: {}").format(action_sequence)
-            return [0, 0]
+            return ["",0, 0]
         logging.debug("Info Line: {} in file: {}".format(info_line, filename))
         if info_line == "":
             logging.error(
                 "Could not find Hand: {} in File: {}".format(hand, filename))
-            return [0, 0]
+            return ["",0, 0]
         infos = info_line.split(";")
         frequency = float(infos[0])
         ev = float(infos[1])
