@@ -2,7 +2,7 @@
 
 from configparser import ConfigParser
 import logging
-from tree_reader_helpers import ActionProcessor
+from preflop_advisor.tree_reader_helpers import ActionProcessor
 import cProfile
 
 # Result Data Structure Keys:
@@ -102,6 +102,14 @@ class TreeReader():
                     row.append({"isInfo": False, "Results": []} )
             self.results.append(row)
 
+        # squeeze line
+        row = [{"isInfo": True, "Text": "squeeze"}]
+        for column_pos in self.position_list:
+            row.append(
+                {"isInfo":False, "Results": self.get_squeeze(pos,column_pos)}
+            )
+        self.results.append(row)  
+            
         # vs 4bet
         row = [{"isInfo": True, "Text": "vs 4bet"}]
         for column_pos in self.position_list:
@@ -163,7 +171,18 @@ class TreeReader():
                 self.hand, [(position,"Raise"),(self.position_list[pos_index+1],"Call"),(squeeze_position,"Raise")], position
             )
         return results
-    
+
+    def get_squeeze(self,position,rfi_position):
+        pos_index = self.position_list.index(position)
+        rfi_index = self.position_list.index(rfi_position)
+
+        if pos_index <= rfi_index + 1: # we have to have at least one player in between rfi and coldcaller
+            return []
+        
+        results = self.action_processor.get_results(
+                self.hand, [(rfi_position,"Raise"),(self.position_list[rfi_index+1],"Call")], position
+            )
+        return results
 def test():
     config = ConfigParser()
     config.read("config.ini")

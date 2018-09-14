@@ -1,0 +1,3 @@
+include preflop_advisor/config.ini
+include README.org
+include LICENSE

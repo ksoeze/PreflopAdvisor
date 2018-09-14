@@ -8,7 +8,7 @@ RANKS = list("AKQJT98765432")
 SUITS = list("cdhs")
 
 # Converts 4 Card Hand like "AsAcTh3d" to monker tree format
-# TODO implement NL convertion (should be simpler than omaha / o8)
+# Added support for 2 Card NL Hands
 
 def convert_hand(hand):
     hand = hand.replace(" ","")

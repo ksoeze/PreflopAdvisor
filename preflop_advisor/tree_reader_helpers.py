@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from configparser import ConfigParser
-from hand_convert_helper import convert_hand
+from preflop_advisor.hand_convert_helper import convert_hand
 
 import logging
 import os.path
