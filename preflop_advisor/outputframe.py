@@ -12,7 +12,7 @@ RESULT_COLUMNS = 8
 RESULT_HEIGHT = 80
 RESULT_WIDTH = 150
 
-INFO_FONT = ("Helvetica", 22)
+INFO_FONT = ("Helvetica", 20)
 
 SUIT_COLORS = {"h": "red", "d": "blue",
                "c": "green", "s": "black"}
@@ -43,14 +43,14 @@ class OutputFrame(tk.Frame):
             RESULT_COLUMNS)] for row in range(RESULT_ROWS)]
         self.create_result_grid()
 
-        self.info_frame.grid(row=0, column=0, pady=30)
+        self.info_frame.grid(row=0, column=0, pady=5)
         self.output_frame.grid(row=1, column=0)
 
     def card_labels(self):
         self.card_str_list = [tk.StringVar() for i in range(4)]
         self.card_labels = [tk.Label(self.info_frame,
                                      textvariable=self.card_str_list[i],
-                                     padx=5,
+                                     padx=2,
                                      font=INFO_FONT) for i in range(4)
                             ]
         for i in range(4):
