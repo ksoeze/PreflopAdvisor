@@ -12,7 +12,7 @@ SUIT_DIC = {0: "h", 1: "c", 2: "s", 3: "d"}
 SUIT_SIGN_DIC = {0: "\u2665", 1: "\u2663", 2: "\u2660", 3: "\u2666"}
 SUIT_COLORS = {"h": "red", "d": "blue",
                "c": "green", "s": "black"}
-BUTTON_FONT = ("Helvetica", "12")
+BUTTON_FONT = ("Helvetica", "11")
 
 
 class CardSelector(tk.Frame):
@@ -32,7 +32,7 @@ class CardSelector(tk.Frame):
 
         self.selected_cards = []
         self.selection_counter = 0
-        
+
     def create_button(self, row, column):
         button = tk.Button(
             self, text=RANK_DIC[row] + SUIT_SIGN_DIC[column],
@@ -91,13 +91,13 @@ class CardSelector(tk.Frame):
             hand += RANK_DIC[card[0]]
             hand += SUIT_DIC[card[1]]
         return hand
-    
-    def set_num_cards(self,num_cards):
+
+    def set_num_cards(self, num_cards):
         if num_cards == 4:
-            self.num_cards=4
+            self.num_cards = 4
         if num_cards == 2:
-            self.num_cards=2
-        return #only 2 or 4 cards are valid...ignore rest
+            self.num_cards = 2
+        return  # only 2 or 4 cards are valid...ignore rest
 
 
 def test(root):

@@ -2,10 +2,11 @@
 
 import tkinter as tk
 from configparser import ConfigParser
+from preflop_advisor.tooltip import CreateToolTip
 
 
 class TreeSelector(tk.Frame):
-    def __init__(self, root, tree_selector_settings, tree_configs, update_output):
+    def __init__(self, root, tree_selector_settings, tree_configs, tree_tooltips, update_output):
         # self.root = root
         tk.Frame.__init__(self, root)
         self.update_output = update_output
@@ -22,6 +23,11 @@ class TreeSelector(tk.Frame):
         self.process_tree_infos(tree_configs)
         self.button_list = [self.create_button(
             r) for r in range(self.num_trees)]
+        
+        if tree_selector_settings["ToolTips"] == "YES":
+            self.tooltips = [tree_tooltips[i] for i in tree_tooltips]
+            self.tooltip_list = self.create_tooltip_list()
+
         self.current_tree = int(tree_selector_settings["DefaultTree"])
         self.select_button(self.current_tree)
 
@@ -35,6 +41,13 @@ class TreeSelector(tk.Frame):
             table_dic["folder"] = infos[3]
             table_dic["infos"] = infos[4]
             self.trees.append(table_dic)
+
+    def create_tooltip_list(self):
+        tooltip_list = []
+        for tooltip, button in zip(self.tooltips, self.button_list):
+            tip = CreateToolTip(button, tooltip)
+            tooltip_list.append(tip)
+        return tip
 
     def create_button(self, row):
         text = str(self.trees[row]["plrs"]) + "-max " + \

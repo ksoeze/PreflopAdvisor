@@ -73,13 +73,20 @@ class ActionProcessor():
                         break  # TODO this fails if we dont find any valid raise size?
 
         if len(full_action_sequence) != len(new_action_sequence):
-            logging.error(
-                "Something went wrong with finding valid RAISE sizes...TAKE A LOOK")
-            logging.error(
-                "Action Sequence: {}".format(full_action_sequence))
-            logging.error(
-                "New Action Sequence: {}".format(new_action_sequence)
-            )
+            if full_action_sequence[-1][1] == "Raise" and "All_In" in [action[1] for action in new_action_sequence]:
+                # we have all in but trying to find reraise action
+                # duno but just adding action anyway so we get empty result?
+                # print("Adding Invalid raise action to see what happens")
+                new_action_sequence.append(
+                    (full_action_sequence[-1][0], self.valid_raise_sizes[-1]))
+            else:
+                logging.warning(
+                    "Something went wrong with finding valid RAISE sizes...TAKE A LOOK")
+                logging.warning(
+                    "Action Sequence: {}".format(full_action_sequence))
+                logging.warning(
+                    "New Action Sequence: {}".format(new_action_sequence)
+                )
         return new_action_sequence
 
     def test_action_sequence(self, action_sequence):
@@ -98,12 +105,12 @@ class ActionProcessor():
         except EnvironmentError:
             logging.error("Could not find File: {}".format(filename))
             logging.error("ActionSequence is: {}").format(action_sequence)
-            return ["",0, 0]
+            return ["", 0, 0]
         logging.debug("Info Line: {} in file: {}".format(info_line, filename))
         if info_line == "":
             logging.error(
                 "Could not find Hand: {} in File: {}".format(hand, filename))
-            return ["",0, 0]
+            return ["", 0, 0]
         infos = info_line.split(";")
         frequency = float(infos[0])
         ev = float(infos[1])

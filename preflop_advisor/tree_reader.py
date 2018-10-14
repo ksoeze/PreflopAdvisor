@@ -20,7 +20,7 @@ class TreeReader():
         self.num_players = tree_infos["plrs"]
         self.init_position_list(self.num_players, self.full_position_list)
 
-        self.hand = hand  
+        self.hand = hand
         self.position = None if position not in self.full_position_list else position
 
         self.configs = configs
@@ -80,14 +80,16 @@ class TreeReader():
 
         # RFI Line (without infos)
         if pos != "BB":
-            row = [{"isInfo": False, "Results": self.action_processor.get_results(self.hand, [], pos)}]
+            row = [{"isInfo": False, "Results": self.action_processor.get_results(
+                self.hand, [], pos)}]
         else:
-            row = [{"isInfo": False, "Results": self.action_processor.get_results(self.hand, [("SB", "Call")], pos)}]
+            row = [{"isInfo": False, "Results": self.action_processor.get_results(
+                self.hand, [("SB", "Call")], pos)}]
 
         for column_pos in self.position_list:
             row.append(
                 {"isInfo": False, "Results": self.get_vs_first_in(
-                    pos, column_pos)}           
+                    pos, column_pos)}
             )
         self.results.append(row)
 
@@ -97,35 +99,44 @@ class TreeReader():
             for column_pos in self.position_list:
                 if column_pos == "BB":
                     row.append(
-                        {"isInfo": False, "Results": self.action_processor.get_results(self.hand, [("SB", "Call"),("BB", "Raise")],pos)})
+                        {"isInfo": False, "Results": self.action_processor.get_results(self.hand, [("SB", "Call"), ("BB", "Raise")], pos)})
                 else:
-                    row.append({"isInfo": False, "Results": []} )
+                    row.append({"isInfo": False, "Results": []})
             self.results.append(row)
 
         # squeeze line
         row = [{"isInfo": True, "Text": "squeeze"}]
         for column_pos in self.position_list:
             row.append(
-                {"isInfo":False, "Results": self.get_squeeze(pos,column_pos)}
+                {"isInfo": False, "Results": self.get_squeeze(pos, column_pos)}
             )
-        self.results.append(row)  
-            
+        self.results.append(row)
+
+        # 4bet
+        row = [{"isInfo": True, "Text": "4bet"}]
+        for column_pos in self.position_list:
+            row.append(
+                {"isInfo": False, "Results": self.get_4bet(pos, column_pos)}
+            )
+        self.results.append(row)
+
         # vs 4bet
         row = [{"isInfo": True, "Text": "vs 4bet"}]
         for column_pos in self.position_list:
             row.append(
-                {"isInfo":False, "Results": self.get_vs_4bet(pos,column_pos)}
+                {"isInfo": False, "Results": self.get_vs_4bet(pos, column_pos)}
             )
         self.results.append(row)
 
-         # vs squeeze
+        # vs squeeze
         row = [{"isInfo": True, "Text": "vs squeeze"}]
         for column_pos in self.position_list:
             row.append(
-                {"isInfo":False, "Results": self.get_vs_squeeze(pos,column_pos)}
+                {"isInfo": False, "Results": self.get_vs_squeeze(
+                    pos, column_pos)}
             )
-        self.results.append(row)       
-        
+        self.results.append(row)
+
         return
 
     def get_vs_first_in(self, position, fi_position):
@@ -145,44 +156,75 @@ class TreeReader():
 
     def get_vs_4bet(self, position, reraise_position):
         pos_index = self.position_list.index(position)
-        if position == reraise_position or pos_index == 0: # both same position or utg spot where there is no possible face 4bet
+        # both same position or utg spot where there is no possible face 4bet
+        if position == reraise_position or pos_index == 0:
             return []
         if pos_index > self.position_list.index(reraise_position):
             # we 3bet and face a 4bet from the opener:
             results = self.action_processor.get_results(
-                self.hand, [(reraise_position,"Raise"),(position,"Raise"),(reraise_position,"Raise")], position
+                self.hand, [(reraise_position, "Raise"), (position,
+                                                          "Raise"), (reraise_position, "Raise")], position
             )
         else:
             # we face cold4bet after the position before us opens and we 3bet:
-            opener=self.position_list[pos_index - 1]
+            opener = self.position_list[pos_index - 1]
             results = self.action_processor.get_results(
-                self.hand, [(opener,"Raise"),(position, "Raise"),(reraise_position,"Raise")], position
+                self.hand, [(opener, "Raise"), (position, "Raise"),
+                            (reraise_position, "Raise")], position
             )
         return results
-    
-    def get_vs_squeeze(self,position,squeeze_position):
+
+    def get_vs_squeeze(self, position, squeeze_position):
         pos_index = self.position_list.index(position)
         squeeze_index = self.position_list.index(squeeze_position)
 
-        if squeeze_index <= pos_index + 1: # squeezer must be after opener + at least one coldcall in between
+        if squeeze_index <= pos_index + 1:  # squeezer must be after opener + at least one coldcall in between
             return []
-        
+
         results = self.action_processor.get_results(
-                self.hand, [(position,"Raise"),(self.position_list[pos_index+1],"Call"),(squeeze_position,"Raise")], position
+            self.hand, [(position, "Raise"), (self.position_list[pos_index+1],
+                                              "Call"), (squeeze_position, "Raise")], position
+        )
+        return results
+
+    def get_4bet(self, position, threebet_position):
+        pos_index = self.position_list.index(position)
+        threebet_pos_index = self.position_list.index(threebet_position)
+
+        if position == threebet_position:
+            return []
+        if pos_index > threebet_pos_index:  # cold4bet spot
+            if threebet_pos_index == 0:  # vs utg there is no cold4bet
+                return []
+            else:
+                results = self.action_processor.get_results(
+                    self.hand,
+                    [(self.position_list[threebet_pos_index-1], "Raise"),
+                     (threebet_position, "Raise")],
+                    position
+                )
+        else:  # std face 3bet spot after open
+            results = self.action_processor.get_results(
+                self.hand,
+                [(position, "Raise"), (threebet_position, "Raise")],
+                position
             )
         return results
 
-    def get_squeeze(self,position,rfi_position):
+    def get_squeeze(self, position, rfi_position):
         pos_index = self.position_list.index(position)
         rfi_index = self.position_list.index(rfi_position)
 
-        if pos_index <= rfi_index + 1: # we have to have at least one player in between rfi and coldcaller
+        if pos_index <= rfi_index + 1:  # we have to have at least one player in between rfi and coldcaller
             return []
-        
+
         results = self.action_processor.get_results(
-                self.hand, [(rfi_position,"Raise"),(self.position_list[rfi_index+1],"Call")], position
-            )
+            self.hand, [(rfi_position, "Raise"),
+                        (self.position_list[rfi_index+1], "Call")], position
+        )
         return results
+
+
 def test():
     config = ConfigParser()
     config.read("config.ini")
