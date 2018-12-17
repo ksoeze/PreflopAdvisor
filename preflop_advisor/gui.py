@@ -8,6 +8,7 @@ from preflop_advisor.card_selector import CardSelector
 from preflop_advisor.tree_selector import TreeSelector
 from preflop_advisor.position_selector import PositionSelector
 from preflop_advisor.outputframe import OutputFrame
+from preflop_advisor.randomizer import RandomButton
 
 SCREEN_SCRAPPER = True
 
@@ -47,6 +48,10 @@ class MainWindow:
             self.card_selector_position_frame,
             self.configs["PositionSelector"],
             self.update_output_frame)
+        self.rand_button = RandomButton(
+            self.card_selector_position_frame,
+            self.configs["PositionSelector"],
+        )
         self.output = OutputFrame(
             self.output_frame,
             self.configs["Output"],
@@ -57,7 +62,7 @@ class MainWindow:
             self.player_list_frame = tk.Frame(self.root, pady=10)
             self.screen_scrapper = ScreenScrapperFrame(
                 self.card_list_frame, self.player_list_frame, self.update_output_frame)
-            print("Create ScreenScrapperFrame")
+            #print("Create ScreenScrapperFrame")
         self.grid_frames()
 
     def grid_frames(self):
@@ -70,8 +75,9 @@ class MainWindow:
         self.card_selector_position_frame.grid(row=0, column=0, sticky='W')
         self.tree_selector.grid(row=1, column=0, columnspan=2)
 
-        self.card_selector.grid(row=0, column=0)
-        self.position_selector.grid(row=0, column=1, sticky="S")
+        self.card_selector.grid(row=0, column=0, rowspan=2)
+        self.rand_button.grid(row=0, column=1)
+        self.position_selector.grid(row=1, column=1, sticky="S")
 
     def update_output_frame(self):
         tree_infos = self.tree_selector.get_tree_infos()

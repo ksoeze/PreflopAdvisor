@@ -17,7 +17,7 @@ NL is generally also supported but is currently not working out of the box.
 
 - Copy project to location of your choice
 - Export Monker Ranges of the trees you want to use
-- open preflop_advisor/config.ini
+- open preflop_advisor/config.ini (use the IDLE Editor if Windows Editor shows no newlines)
   - Section [TreeSelector] edit NumTrees
   - Section [TreeInfos] add trees using full path
   - Section [TreeToolTips] add further tree infos you want to show when hoovering over it. 
@@ -30,6 +30,12 @@ NL is generally also supported but is currently not working out of the box.
 - you can install the tool in your python distribution using 
   python setup.py install
   or just start the tool by running standalone.py in the top folder using python3
+- On high Resolution Monitors the Font can be little bit too small:
+  - CardSelector Font is in: card_selector.py BUTTON_FONT at the top
+  - TreeSelector Font is in: config.ini [TreeSelector] -> FontSize
+  - PositionSelector Font is in: config.ini [PositoinSelector] -> FontSize
+  - Output Font is int: output_objects.py -> RESULT_FONT
+  - I know very bad style ... just change fontsize and / or font as you like...the gui overall is even more ugly on windows than on linux ^^
 
 * Interface Description
 
