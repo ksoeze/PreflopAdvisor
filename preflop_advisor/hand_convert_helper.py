@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import logging
+import re
+import glob
 
 RANK_ORDER = {'A': 12, 'K': 11, 'Q': 10, 'J': 9, 'T': 8, '9': 7,
               '8': 6, '7': 5, '6': 4, '5': 3, '4': 2, '3': 1, '2': 0}
@@ -105,9 +107,49 @@ def convert_omaha_hand(hand):
         return_hand += ")"
     return return_hand
 
+def sort_monker_2_hand(hand):
+    if "(" not in hand:
+        return ''.join(sorted(hand,key=lambda x: RANK_ORDER[x[0]]))
+    if hand.count("(") == 1:
+        suited = re.search('\((.+?)\)',hand).group(1)
+        unsuited = re.sub('\((.+?)\)','',hand)
+        return ''.join(sorted(unsuited,key=lambda x: RANK_ORDER[x[0]])) + "(" + ''.join(sorted(suited,key=lambda x: RANK_ORDER[x[0]])) + ")"
+    if hand.count("(") == 2:
+        suited1 = hand[0:4]
+        if RANK_ORDER[suited1[1]] > RANK_ORDER[suited1[2]]:
+            suited1 = "("+suited1[2]+suited1[1] + ")"
+        suited2 = hand[4:8]
+        #print(suited1)
+        #print(suited2)
+        if RANK_ORDER[suited2[1]] > RANK_ORDER[suited2[2]]:
+            suited2 = "("+suited2[2]+suited2[1] + ")"
+        if RANK_ORDER[suited1[1]] > RANK_ORDER[suited2[2]]:
+            return suited2 + suited1
+        else:
+            return suited1 + suited2
+    return hand
+
+def replace_monker_2_hands(filename):
+    new_content=""
+    with open(filename,'r') as f:
+        for line in f:
+            if ";" not in line: #hand not ev values
+                new_content+=sort_monker_2_hand(line[0:-1])+"\n"
+            else:
+                new_content+=line
+    with open(filename,"w") as f:
+        f.write(new_content)
+
+def replace_all_monker_2_files(path):
+    all_files = glob.glob(path+"*.rng")
+    for file in all_files:
+        replace_monker_2_hands(file)
 
 def test():
-    print(convert_hand("Ah8h"))
+    print(convert_hand("Ah8h8s2c"))
+    #print(sort_monker_2_hand("(AK)(45)"))
+    #replace_monker_2_hands("/media/johann/MONKER/monker-beta/ranges/Omaha/6-way/40bb/0.0.rng")
+    replace_all_monker_2_files("/media/johann/MONKER/monker-beta/ranges/Omaha/6-way/40bb-pot/")
 
 if (__name__ == '__main__'):
     test()

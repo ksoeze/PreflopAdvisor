@@ -28,7 +28,6 @@ class RandomButton(tk.Frame):
                       padx=self.button_pad, pady=self.button_pad)
         self.text_lable.set(init_label)
         button.grid(row=0, column=0)
-        print("TEST")
         return button
 
     def on_button_clicked(self):

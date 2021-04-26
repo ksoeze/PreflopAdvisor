@@ -39,7 +39,10 @@ class TreeSelector(tk.Frame):
             table_dic["bb"] = int(infos[1])
             table_dic["game"] = infos[2]
             table_dic["folder"] = infos[3]
-            table_dic["infos"] = infos[4]
+            table_dic["infos"]=infos[4]
+            info_length = len(infos[4])
+            if info_length < 11:
+                table_dic["infos"]=" "*(11-info_length)+infos[4]
             self.trees.append(table_dic)
 
     def create_tooltip_list(self):
@@ -50,9 +53,13 @@ class TreeSelector(tk.Frame):
         return tip
 
     def create_button(self, row):
-        text = str(self.trees[row]["plrs"]) + "-max " + \
-            str(self.trees[row]["bb"]) + "bb" + " " + \
-            self.trees[row]["game"] + " " + self.trees[row]["infos"]
+        plr_txt = str(self.trees[row]["plrs"]) + "-max "
+        bb_txt = " "*(3-len(str(self.trees[row]["bb"]))) + str(self.trees[row]["bb"]) + "bb " 
+        #text = str(self.trees[row]["plrs"]) + "m " + \
+        #    str(self.trees[row]["bb"]) + "bb" + " " + self.trees[row]["infos"] 
+        #self.trees[row]["game"] + " " +
+
+        text = plr_txt + bb_txt + self.trees[row]["game"]+" " + self.trees[row]["infos"]
         if len(text) > self.button_width:
             self.button_width = len(text)
         button = tk.Button(
@@ -60,7 +67,7 @@ class TreeSelector(tk.Frame):
         button.config(height=self.button_height,
                       width=self.button_width,
                       bg=self.background,
-                      font=(self.font, self.fontsize), padx=self.button_pad, pady=self.button_pad)
+                      font=(self.font, self.fontsize, 'bold'), padx=self.button_pad, pady=self.button_pad)
         button.grid(row=row)
         return button
 

@@ -12,7 +12,7 @@ SUIT_DIC = {0: "h", 1: "c", 2: "s", 3: "d"}
 SUIT_SIGN_DIC = {0: "\u2665", 1: "\u2663", 2: "\u2660", 3: "\u2666"}
 SUIT_COLORS = {"h": "red", "d": "blue",
                "c": "green", "s": "black"}
-BUTTON_FONT = ("Helvetica", "11")
+BUTTON_FONT = ("Helvetica", "14")
 
 
 class CardSelector(tk.Frame):

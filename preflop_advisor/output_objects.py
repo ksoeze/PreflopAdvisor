@@ -1,11 +1,11 @@
-#!/usr/bin/env python3
+10#!/usr/bin/env python3
 
 import tkinter as tk
 from tkinter import ttk
 from configparser import ConfigParser
 
 INFO_FONT = ("Helvetica", 15)
-RESULT_FONT = ("Helvetica", 8)
+RESULT_FONT = ("Helvetica", 10)
 
 
 class TableEntry(tk.Frame):

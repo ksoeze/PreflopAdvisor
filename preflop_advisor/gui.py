@@ -58,7 +58,7 @@ class MainWindow:
             self.configs["TreeReader"])
 
         if SCREEN_SCRAPPER:
-            self.card_list_frame = tk.Frame(self.input_frame, pady=10)
+            self.card_list_frame = tk.Frame(self.input_frame, pady=2)
             self.player_list_frame = tk.Frame(self.root, pady=10)
             self.screen_scrapper = ScreenScrapperFrame(
                 self.card_list_frame, self.player_list_frame, self.update_output_frame)
