@@ -31,7 +31,7 @@ class OutputFrame(tk.Frame):
         self.general_infos_label = tk.Label(
             self.info_frame,
             textvariable=self.general_infos,
-            font=INFO_FONT).grid(row=0, column=4)
+            font=INFO_FONT).grid(row=0, column=5)
 
         self.card_labels()
 
@@ -47,13 +47,13 @@ class OutputFrame(tk.Frame):
         self.output_frame.grid(row=1, column=0)
 
     def card_labels(self):
-        self.card_str_list = [tk.StringVar() for i in range(4)]
+        self.card_str_list = [tk.StringVar() for i in range(5)]
         self.card_labels = [tk.Label(self.info_frame,
                                      textvariable=self.card_str_list[i],
                                      padx=2,
-                                     font=INFO_FONT) for i in range(4)
+                                     font=INFO_FONT) for i in range(5)
                             ]
-        for i in range(4):
+        for i in range(5):
             self.card_labels[i].grid(row=0, column=i)
 
     def set_card_label(self, hand):

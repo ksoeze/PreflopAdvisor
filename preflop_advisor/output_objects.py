@@ -5,8 +5,9 @@ from tkinter import ttk
 from configparser import ConfigParser
 
 INFO_FONT = ("Helvetica", 15)
+INFO_FONT = ("Helvetica", 20)
 RESULT_FONT = ("Helvetica", 10)
-
+RESULT_FONT = ("Helvetica", 12)
 
 class TableEntry(tk.Frame):
     def __init__(self, root, width, height):

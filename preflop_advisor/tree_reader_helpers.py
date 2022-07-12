@@ -99,7 +99,7 @@ class ActionProcessor():
         try:
             with open(filename, "r") as f:
                 for line in f:
-                    if hand + "\n" in line and len(line) < 10: # newline added to distinguish between 2345 and (2345)
+                    if hand + "\n" in line and len(line) < 12: # newline added to distinguish between 2345 and (2345)
                         info_line = f.readline()
                         break
         except EnvironmentError:

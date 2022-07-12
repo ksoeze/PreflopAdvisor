@@ -13,6 +13,7 @@ SUIT_SIGN_DIC = {0: "\u2665", 1: "\u2663", 2: "\u2660", 3: "\u2666"}
 SUIT_COLORS = {"h": "red", "d": "blue",
                "c": "green", "s": "black"}
 BUTTON_FONT = ("Helvetica", "14")
+#BUTTON_FONT = ("Helvetica", "19")
 
 
 class CardSelector(tk.Frame):
@@ -97,7 +98,9 @@ class CardSelector(tk.Frame):
             self.num_cards = 4
         if num_cards == 2:
             self.num_cards = 2
-        return  # only 2 or 4 cards are valid...ignore rest
+        if num_cards == 5:
+            self.num_cards =5
+        return  # only 2 or 4 or 5 cards are valid...ignore rest
 
 
 def test(root):

@@ -3,6 +3,8 @@
 import logging
 import re
 import glob
+import json
+import os
 
 RANK_ORDER = {'A': 12, 'K': 11, 'Q': 10, 'J': 9, 'T': 8, '9': 7,
               '8': 6, '7': 5, '6': 4, '5': 3, '4': 2, '3': 1, '2': 0}
@@ -18,6 +20,8 @@ def convert_hand(hand):
         return convert_omaha_hand(hand)
     elif len(hand) == 4:
         return convert_holdem_hand(hand)
+    elif len(hand) == 10:
+        return convert_omaha5_hand(hand)
     logging.error(
             "Hand: {} cannot be converted...wrong length".format(hand))
     return hand
@@ -107,8 +111,47 @@ def convert_omaha_hand(hand):
         return_hand += ")"
     return return_hand
 
+
+def convert_omaha5_hand(hand):
+    if len(hand) != 8 and len(hand) !=10:
+        logging.error(
+            "Omaha Hand: {} cannot be converted...wrong length".format(hand))
+        return hand
+    ranks = [x for x in hand if x in RANKS]
+    suits = [x for x in hand if x in SUITS]
+    if len(ranks) != 4 and len(ranks) != 5 or len(ranks)-len(suits)!=0:
+        logging.error(
+            "Omaha Hand: {} cannot be converted".format(hand))
+        return hand
+
+    cards = [hand[i:i+2] for i in range(0,len(hand),2)]
+    suit_ranks = {"s": [], "d": [], "h": [], "c": []}
+    for s in suit_ranks:
+        for card in cards:
+            if card[1] == s:
+                suit_ranks[s].append(card[0])
+    for s in suit_ranks:
+        suit_ranks[s] = sorted(suit_ranks[s],key=lambda  x:RANK_ORDER[x])
+
+    unsuited_cards=[]
+    for s in suit_ranks:
+        if len(suit_ranks[s]) == 1:
+            unsuited_cards.append(suit_ranks[s][0])
+    suited_cards=[]
+    for s in suit_ranks:
+        if len(suit_ranks[s]) > 1:
+            suited_cards.append(suit_ranks[s])
+    unsuited_string = ''.join(sorted(unsuited_cards,key=lambda  x:RANK_ORDER[x]))
+    suited_cards = sorted(suited_cards,key=lambda x:RANK_ORDER[x[0]])
+    suited_string=''
+    for item in suited_cards:
+        suited_string+="(" + ''.join(item) + ")"
+    return unsuited_string+suited_string
+
 def sort_monker_2_hand(hand):
     if "(" not in hand:
+        if hand[0] not in RANKS:
+            print(hand)
         return ''.join(sorted(hand,key=lambda x: RANK_ORDER[x[0]]))
     if hand.count("(") == 1:
         suited = re.search('\((.+?)\)',hand).group(1)
@@ -123,17 +166,40 @@ def sort_monker_2_hand(hand):
         #print(suited2)
         if RANK_ORDER[suited2[1]] > RANK_ORDER[suited2[2]]:
             suited2 = "("+suited2[2]+suited2[1] + ")"
-        if RANK_ORDER[suited1[1]] > RANK_ORDER[suited2[2]]:
+
+        if RANK_ORDER[suited1[2]] == RANK_ORDER[suited2[2]]:
+            if RANK_ORDER[suited1[1]] > RANK_ORDER[suited2[1]]:
+                return suited2 + suited1
+            else:
+                return suited1 + suited2
+        if RANK_ORDER[suited1[2]] > RANK_ORDER[suited2[2]]:
             return suited2 + suited1
         else:
             return suited1 + suited2
     return hand
 
+def sort_omaha5_hand(hand):
+    if hand.count("(") == 1:
+        suited = re.search('\((.+?)\)',hand).group(1)
+        unsuited = re.sub('\((.+?)\)','',hand)
+        return ''.join(sorted(unsuited,key=lambda x: RANK_ORDER[x[0]])) + "(" + ''.join(sorted(suited,key=lambda x: RANK_ORDER[x[0]])) + ")"
+    else:
+        suited = re.findall('\((.+?)\)',hand)
+        unsuited = re.sub('\((.+?)\)(.*?)\((.+?)\)','',hand)
+        suited_list = []
+        for item in suited:
+            suited_list.append(''.join(sorted(item,key=lambda x: RANK_ORDER[x[0]])))
+        suited_list = sorted(suited_list,key=lambda x: RANK_ORDER[x[0]])
+        suited = "("+''.join(suited_list[0])+")"+"("+''.join(suited_list[1])+")"
+        return ''.join(sorted(unsuited,key=lambda x: RANK_ORDER[x[0]])) + suited
+    print("convert error! {}".format(hand))
+
 def replace_monker_2_hands(filename):
     new_content=""
     with open(filename,'r') as f:
+        #print(filename)
         for line in f:
-            if ";" not in line: #hand not ev values
+            if ";" not in line and line[0]!="0": #hand not ev values
                 new_content+=sort_monker_2_hand(line[0:-1])+"\n"
             else:
                 new_content+=line
@@ -145,11 +211,27 @@ def replace_all_monker_2_files(path):
     for file in all_files:
         replace_monker_2_hands(file)
 
-def test():
-    print(convert_hand("Ah8h8s2c"))
-    #print(sort_monker_2_hand("(AK)(45)"))
-    #replace_monker_2_hands("/media/johann/MONKER/monker-beta/ranges/Omaha/6-way/40bb/0.0.rng")
-    replace_all_monker_2_files("/media/johann/MONKER/monker-beta/ranges/Omaha/6-way/40bb-pot/")
+def move_plo5_file(work_path,inputfilename,outputfilename):
+    input_file = os.path.join(work_path,inputfilename)
+    with open(input_file,'r') as json_file:
+        data = json.load(json_file)
 
+    hands = data["items"]
+    output_file = os.path.join(work_path,outputfilename)
+    with open(output_file,'w') as range_file:
+        for item in hands:
+            range_file.write(
+                sort_omaha5_hand(item["combo"].replace("[","(").replace("]",")"))+"\n")
+            range_file.write(str(item["frequency"])+";"+str(item["ev"])+"\n")
+
+def test():
+    #print(convert_hand("Ad8s7h2c4c"))
+    #print(sort_monker_2_hand("(98)(T7)"))
+    #print(sort_monker_2_hand("(QA)(3A)"))
+    #replace_monker_2_hands("/media/johann/MONKER/monker-beta/ranges/Omaha/6-way/40bb/0.0.rng")
+
+    #replace_all_monker_2_files("/home/johann/monker-beta/ranges/Omaha/6-way/40bb/")
+
+    move_plo5_file("/home/johann/monker-beta/ranges/Omaha5/HU/50bb/","range","1.1.rng")
 if (__name__ == '__main__'):
     test()

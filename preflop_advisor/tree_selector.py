@@ -32,9 +32,10 @@ class TreeSelector(tk.Frame):
         self.select_button(self.current_tree)
 
     def process_tree_infos(self, tree_infos):
-        for table in tree_infos:
+        for index,table in enumerate(tree_infos):
             infos = tree_infos[table].split(",")
             table_dic = {}
+            table_dic["index"] = index
             table_dic["plrs"] = int(infos[0])
             table_dic["bb"] = int(infos[1])
             table_dic["game"] = infos[2]
@@ -83,6 +84,14 @@ class TreeSelector(tk.Frame):
         self.current_tree = row
         self.select_button(row)
         self.tree_changed()
+
+    def set_other_tree(self, row):
+        if row == self.current_tree:
+            return
+        self.deselect_button(self.current_tree)
+        self.current_tree = row
+        self.select_button(row)
+        #self.tree_changed()
 
     def deselect_button(self, row):
         self.button_list[row].config(relief="raised", bg=self.background)

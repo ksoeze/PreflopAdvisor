@@ -14,6 +14,7 @@ SCREEN_SCRAPPER = True
 
 try:
     from screen_scrapper.screen_scrapper_frame import ScreenScrapperFrame
+    #SCREEN_SCRAPPER = False
 except ImportError:
     SCREEN_SCRAPPER = False
 
@@ -62,6 +63,8 @@ class MainWindow:
             self.player_list_frame = tk.Frame(self.root, pady=10)
             self.screen_scrapper = ScreenScrapperFrame(
                 self.card_list_frame, self.player_list_frame, self.update_output_frame)
+            self.last_plo_tree = int(self.configs["TreeSelector"]["DefaultTree"])
+            self.last_plo5_tree =int(self.configs["TreeSelector"]["DefaultPLO5Tree"])
             #print("Create ScreenScrapperFrame")
         self.grid_frames()
 
@@ -89,14 +92,22 @@ class MainWindow:
         position = self.position_selector.get_position()
         hand = self.card_selector.get_hand()
 
-        if len(hand) == 4 and game == "NL" or len(hand) == 8 and game in ["PLO", "PLO8"]:
+        if len(hand) == 4 and game == "NL" or len(hand) == 8 and game in ["PLO", "PLO8"] or len(hand) == 10 and game == "PLO5":
             self.output.update_output_frame(hand, position, tree_infos)
             return
 
         if SCREEN_SCRAPPER:
             hand = self.screen_scrapper.get_selected_hand()  # TODO ignores position for now
-            if len(hand) == 4 and game == "NL" or len(hand) == 8 and game in ["PLO", "PLO8"]:
-                self.output.update_output_frame(hand, position, tree_infos)
+            if len(hand) == 8 and tree_infos["index"] >= int(self.configs["TreeSelector"]["DefaultPLO5Tree"]):
+                self.last_plo5_tree = tree_infos["index"]
+                self.tree_selector.set_other_tree(self.last_plo_tree)
+                self.update_card_and_position_selector(self.tree_selector.get_tree_infos())
+            if len(hand) == 10 and tree_infos["index"] < int(self.configs["TreeSelector"]["DefaultPLO5Tree"]):
+                self.last_plo_tree = tree_infos["index"]
+                self.tree_selector.set_other_tree(self.last_plo5_tree)
+                self.update_card_and_position_selector(self.tree_selector.get_tree_infos())
+            if len(hand) == 4 and game == "NL" or len(hand) == 8 or len(hand) == 10:
+                self.output.update_output_frame(hand, position, self.tree_selector.get_tree_infos())
 
     def update_card_and_position_selector(self, tree_infos):
         # select 4 or 2 cards in card_selector depending on game
@@ -108,7 +119,8 @@ class MainWindow:
             self.card_selector.set_num_cards(4)
         elif game in ["NL"]:
             self.card_selector.set_num_cards(2)
-
+        elif game in ["PLO5"]:
+            self.card_selector.set_num_cards(5)   
         self.position_selector.update_active_positions(num_players)
 
 

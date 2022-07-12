@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+import os.path
 import tkinter as tk
 from PIL import ImageTk, Image
 
@@ -19,13 +19,15 @@ class CreateToolTip(object):
     def enter(self, event=None):
         x = y = 0
         x, y, cx, cy = self.widget.bbox("insert")
-        x += self.widget.winfo_rootx() + 50  # 25
-        y += self.widget.winfo_rooty() + 60  # 20
+        x += self.widget.winfo_rootx() + 200  # 25
+        y += self.widget.winfo_rooty() - 300  # 20
         # creates a toplevel window
         self.tw = tk.Toplevel(self.widget)
         # Leaves only the label and removes the app window
         self.tw.wm_overrideredirect(True)
         self.tw.wm_geometry("+%d+%d" % (x, y))
+        if os.path.exists(self.text):
+            self.pic=True
         if not self.pic:
             label = tk.Label(self.tw, text=self.text, justify='left',
                              background='yellow', relief='solid', borderwidth=1,
@@ -33,7 +35,7 @@ class CreateToolTip(object):
             label.pack(ipadx=1)
         else:
             load = Image.open(self.text)
-            load = load.resize((800, 450)) #change to default sizing
+            load = load.resize((800, 800)) #change to default sizing
             render = ImageTk.PhotoImage(load)
             img = tk.Label(self.tw, image=render)
             img.image = render
