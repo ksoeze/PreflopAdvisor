@@ -142,7 +142,7 @@ def convert_omaha5_hand(hand):
         if len(suit_ranks[s]) > 1:
             suited_cards.append(suit_ranks[s])
     unsuited_string = ''.join(sorted(unsuited_cards,key=lambda  x:RANK_ORDER[x]))
-    suited_cards = sorted(suited_cards,key=lambda x:RANK_ORDER[x[0]])
+    suited_cards = sorted(suited_cards,key=lambda x:(RANK_ORDER[x[0]],RANK_ORDER[x[1]]))
     suited_string=''
     for item in suited_cards:
         suited_string+="(" + ''.join(item) + ")"
@@ -189,7 +189,7 @@ def sort_omaha5_hand(hand):
         suited_list = []
         for item in suited:
             suited_list.append(''.join(sorted(item,key=lambda x: RANK_ORDER[x[0]])))
-        suited_list = sorted(suited_list,key=lambda x: RANK_ORDER[x[0]])
+        suited_list = sorted(suited_list,key=lambda x: (RANK_ORDER[x[0]],RANK_ORDER[x[1]]))
         suited = "("+''.join(suited_list[0])+")"+"("+''.join(suited_list[1])+")"
         return ''.join(sorted(unsuited,key=lambda x: RANK_ORDER[x[0]])) + suited
     print("convert error! {}".format(hand))
@@ -200,7 +200,7 @@ def replace_monker_2_hands(filename):
         #print(filename)
         for line in f:
             if ";" not in line and line[0]!="0": #hand not ev values
-                new_content+=sort_monker_2_hand(line[0:-1])+"\n"
+                new_content += sort_monker_2_hand(line[0:-1]) + "\n"
             else:
                 new_content+=line
     with open(filename,"w") as f:
@@ -224,14 +224,26 @@ def move_plo5_file(work_path,inputfilename,outputfilename):
                 sort_omaha5_hand(item["combo"].replace("[","(").replace("]",")"))+"\n")
             range_file.write(str(item["frequency"])+";"+str(item["ev"])+"\n")
 
+def move_plo5_postflop_file(work_path,inputfilename,outputfilename):
+    input_file = os.path.join(work_path,inputfilename)
+    with open(input_file,'r') as json_file:
+        data = json.load(json_file)
+
+    hands = data["items"]
+    output_file = os.path.join(work_path,outputfilename)
+    with open(output_file,'w') as range_file:
+        for item in hands:
+            range_file.write(item["combo"]+"," + str(item["weight"])+"," + str(item["ev"]*1000)+"\n")
+
 def test():
     #print(convert_hand("Ad8s7h2c4c"))
     #print(sort_monker_2_hand("(98)(T7)"))
     #print(sort_monker_2_hand("(QA)(3A)"))
     #replace_monker_2_hands("/media/johann/MONKER/monker-beta/ranges/Omaha/6-way/40bb/0.0.rng")
 
-    #replace_all_monker_2_files("/home/johann/monker-beta/ranges/Omaha/6-way/40bb/")
+    #replace_all_monker_2_files("/home/johann/monker-beta/ranges/Omaha5/6-way/100bb/")
 
-    move_plo5_file("/home/johann/monker-beta/ranges/Omaha5/HU/50bb/","range","1.1.rng")
+    #move_plo5_postflop_file("/home/johann/monker-beta/ranges","CHECK","CHECK.csv")
+    #move_plo5_postflop_file("/home/johann/monker-beta/ranges","BET75","BET75.csv")
 if (__name__ == '__main__'):
     test()
