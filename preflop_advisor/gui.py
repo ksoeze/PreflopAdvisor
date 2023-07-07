@@ -12,6 +12,11 @@ from preflop_advisor.randomizer import RandomButton
 
 SCREEN_SCRAPPER = True
 
+RANKS = list("AKQJT98765432")
+SUITS = list("cdhs")
+CARDS = list(rank + suit for suit in SUITS for rank in RANKS)
+
+from screen_scrapper.screen_scrapper_frame import ScreenScrapperFrame
 try:
     from screen_scrapper.screen_scrapper_frame import ScreenScrapperFrame
     #SCREEN_SCRAPPER = False
@@ -98,6 +103,9 @@ class MainWindow:
 
         if SCREEN_SCRAPPER:
             hand = self.screen_scrapper.get_selected_hand()  # TODO ignores position for now
+            for i in range(0,len(hand),2):
+                if hand[i:i+2] not in CARDS:
+                    return 
             if len(hand) == 8 and tree_infos["index"] >= int(self.configs["TreeSelector"]["DefaultPLO5Tree"]):
                 self.last_plo5_tree = tree_infos["index"]
                 self.tree_selector.set_other_tree(self.last_plo_tree)

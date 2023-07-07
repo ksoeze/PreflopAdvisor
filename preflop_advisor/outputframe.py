@@ -73,13 +73,15 @@ class OutputFrame(tk.Frame):
         self.general_infos.set(text)
 
     def update_output_frame(self, hand, position, tree):
-        tree_infos = "{}-max {}bb {} {}".format(
-            tree["plrs"], tree["bb"], tree["game"], tree["infos"])
-        self.update_info_frame(hand, position, tree_infos)
+        # tree_reader.fill_default_results()
         tree_reader = TreeReader(hand, position, tree,
                                  self.tree_reader_configs)
-        # tree_reader.fill_default_results()
         results = tree_reader.get_results()
+
+        tree_infos = "{}-max {}bb {} {}".format(
+            tree["plrs"], tree["bb"], tree["game"], tree["infos"])
+
+        self.update_info_frame(hand, position, tree_infos)
 
         for row in range(RESULT_ROWS):
             for column in range(RESULT_COLUMNS):
