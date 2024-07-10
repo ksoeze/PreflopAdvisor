@@ -9,8 +9,8 @@ from preflop_advisor.output_objects import TableEntry
 
 RESULT_ROWS = 7
 RESULT_COLUMNS = 8
-RESULT_HEIGHT = 80
-RESULT_WIDTH = 150
+RESULT_HEIGHT = 70
+RESULT_WIDTH = 110
 
 INFO_FONT = ("Helvetica", 20)
 

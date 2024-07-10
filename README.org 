@@ -1,0 +1,128 @@
+#+AUTHOR: [Johann]
+#+DATE: [2024-07-04 Th]
+#+OPTIONS: toc:t
+
+* Preflop Advisor based on Monker
+
+** Description
+Preflop Advisor is a Python-based tool designed to read frequencies and EVs from PLO and PLO8 Monker preflop simulations for a given hand.
+The idea is to export all of your Monker Preflop Trees and get a very fast action and EV profile of a given hand for different stack sizes, ante structures and number of players without loading the full preflop tree in MonkerSolver and clicking through long action sequences.
+While the tool generally supports No Limit (NL), it is currently not functional out of the box for NL. (Hand based view makes also no sense for NL)
+PLO 5-Card is generally also supported but probably not relevant for most players since Moker Solver 5-card is not available publicly.
+This tool was written for Moker Solver version 1. Monker Solver version 2. exports hands slightly differently and therefore need some preprocessing.
+See Usage for detailed Information. Preflopranges are not uploaded to this repository (only 100bb HU for demonstration) - you have to setup and run your preflop simulations on your own or buy it.
+
+** Features
+    - Concise PLO hand profile for most common preflop actions for all your Monker preflop trees.
+    - Supports multiple (indefinite) preflop strategy trees
+    - Displays frequencies and corresponding EVs to make it easier to evaluate handstrength against opponents who dont play GTO preflop strategy.
+    - Tooltips in order to get a quick overview of the general frequencies and strategies for a given tree.
+
+** Screenshots
+#+CAPTION: Preflop Advisor Interface
+
+* Installation Guide
+** Prerequisites
+Before you begin, ensure you have Python 3.x installed on your computer. You can download it from [[https://www.python.org/downloads/][python.org]]. On Windows, make sure to select "Add Python to PATH" during installation.
+
+** Installation Steps
+
+1. Download the Repository:
+   - Clone the repository or go to the [[https://github.com/ksoeze/PreflopAdvisor][PreflopAdvisor GitHub page]].
+   - Click the green "Code" button and select "Download ZIP".
+   - Extract the ZIP file to a folder on your computer.
+
+2. Open a Terminal or Command Prompt:
+   - On Windows: Press =Win + R=, type =cmd=, and press Enter.
+   - On Linux: Open your preferred terminal emulator.
+
+3. Navigate to the Project Directory:
+   #+BEGIN_SRC sh
+   cd path\to\PreflopAdvisor
+   #+END_SRC
+
+4. Install the Required Dependencies:
+   #+BEGIN_SRC sh
+   pip install -r requirements.txt
+   #+END_SRC
+
+5. Export your Monker Preflop trees:
+   For every tree:
+   - Open the Tree in Monker
+   - Right Click in Range Window -> Export preflop for MonkerViewer
+   - The exported Ranges are in the Monker Solver folder -> ranges
+     move it to another location and/or give it a more descriptive name if you plan to export many trees.
+   - For Monker Solver 2 only:
+     open hand_convert_helper.py
+     in def test() at the bottom:
+     edit the path in replace_all_monker_2_files("/home/johann/monker-beta/ranges/Omaha5/6-way/100bb/")
+     #+BEGIN_SRC sh
+     python hand_convert_helper.py
+     #+END_SRC
+     this can take a few minutes
+6. Configure the Tool:
+   - Open =preflop_advisor/config.ini= in a text editor (e.g., Notepad, nano, vim).
+   - Edit the configuration sections as needed:
+     - [TreeSelector]: Set NumTrees to the number of trees you are using.
+     - [TreeInfos]: make an entry for each tree:
+       + Table12=2,100,PLO,/home/johann/monker-1/ranges/Omaha/HU/100bb/,   no Rake
+         this is an example for the 100bb HU tree - every entry has to be there.
+         Name=Number of Players,Stacksize in BB, GAME, FULL path to the range folder, Rake setting
+     - [TreeToolTips]: Add tooltips for each tree, if desired. Ensure the number of tooltips matches the number of trees.
+       I generated the tooltip infos programmatically using functions in frequency_reader_helper.py
+       For technical users read there and try to figure it output.
+       Otherwise generate a Popup by hand or use one of mine from the popup-pics folder if it fits.
+       Tooltips are optional -> you can disable them setting
+       ToolTips=NO
+7. (Optional) Adjust Font Sizes for High-Resolution Monitors:
+   - CardSelector Font: In =card_selector.py=, update =BUTTON_FONT=.
+   - TreeSelector Font: In =config.ini= under [TreeSelector], update =FontSize=.
+   - PositionSelector Font: In =config.ini= under [PositionSelector], update =FontSize=.
+   - Output Font: In =output_objects.py=, update =RESULT_FONT=.
+
+* Usage
+
+#+begin_src sh
+python standalone.py
+#+end_src
+
+
+** Interface Description
+
+*** Top Left: Card Selector
+Select the desired hand. If you select another card while four cards are already selected, it will start over with a new hand. Clicking on a selected card will unselect it.
+
+*** Bottom Left: Tree Selector
+Displays the list of available trees as configured in =config.ini=. Tooltips provide additional information if configured. Selecting a different tree updates the output for the currently selected hand.
+
+*** Top Middle: Position Selector
+The default position is "X" for an overview of all positions. Selecting a specific position shows detailed information about that position's strategies, including 4bet and squeeze spots.
+
+*** Top Right: Output Grid
+Top line shows Hand, Position and general Information about the currently selected Tree
+**** General Overview (Position = X)
+First column shows available positions.
+Second column the first in action. For positions other then SB it asumes the there is only openraise possible.
+For Example UTG FI for this hand shows:
+- 1 Line Raise100 (meaning potopen...it shows the descrition for the sizing given in config.ini)
+- 2 Line 0 (Shows the frequency suggested by monker; If the frequency is over 50% the item is has lighter background for better visibility)
+- 3 Line -0.14 (EV estimate by monker in BIG BLINDS (changed that from default monker milli-sb because I am more used to it))
+also in contrast to monker interface it shows relative EVs (when facing for example a 3-bet it shows ev compared to folding at this point and not overall ev from the start)
+Other column shows infos vs positions -> if position in top line comes before our position it shows action us facing an openraise. Left item is
+call, right item is 3bet. Otherwise we open and face a 3bet from the other position (left item call 3bet; right item 4bet)
+Small Blind has option to openlimp. If your tree only thas open or fold strategy you get an error message in the terminal output which can be
+ignored. It then just shows the raise item. SB vs BB entry shows action after we openraise. For action after we openlimp and BB raises see SB position view.
+*** Position Overview
+- First result line is equal to the corresponding result line from default view.
+- Squeeze: Gives the action for column position opens and player right next to him coldcalls and it folds to us where we can call/squeeze.
+So it is the "tightest" of the squeeze spots possible vs this opener. Again if there is no 2nd overcall in the tree it writes error message to terminal.
+- 4bet: If column position is before is it asumes an open from the player before him, he 3bets and we have the option to cold4bet. Otherwise it
+shows standard we open and face a 3bet from the other position.
+- vs 4bet: same idea. position before us means we face 4bet from opener after we 3bet him and otherwise we face cold4bet after we 3bet player right before us.
+- vs squeeze: we open and player right next to us flatts and we then face the squeeze from the column position (classic sandwich spot)
+
+* License
+This project is licensed under the MIT License - see the =LICENSE= file for details.
+
+* Contact
+The software is provided as-is with no plans for further features or major changes. For short questions or minor changes, feel free to reach out.

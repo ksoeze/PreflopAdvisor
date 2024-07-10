@@ -64,7 +64,8 @@ class MainWindow:
             self.configs["TreeReader"])
 
         if SCREEN_SCRAPPER:
-            self.card_list_frame = tk.Frame(self.input_frame, pady=2)
+            #self.card_list_frame = tk.Frame(self.input_frame, pady=2)
+            self.card_list_frame = tk.Frame(self.root, pady=2)
             self.player_list_frame = tk.Frame(self.root, pady=10)
             self.screen_scrapper = ScreenScrapperFrame(
                 self.card_list_frame, self.player_list_frame, self.update_output_frame)
@@ -75,10 +76,10 @@ class MainWindow:
 
     def grid_frames(self):
         self.input_frame.grid(row=0, column=0, rowspan=2, sticky='N')
-        self.output_frame.grid(row=0, column=1, padx=100, sticky='N')
+        self.output_frame.grid(row=0, column=1, padx=0, sticky='WN')
         if SCREEN_SCRAPPER:
-            self.card_list_frame.grid(row=3, column=0, sticky='N')
-            self.player_list_frame.grid(row=1, column=1, padx=10, pady=10)
+            self.card_list_frame.grid(row=1, column=1, sticky='W')
+            #self.player_list_frame.grid(row=1, column=1, padx=10, pady=10)
 
         self.card_selector_position_frame.grid(row=0, column=0, sticky='W')
         self.tree_selector.grid(row=1, column=0, columnspan=2)

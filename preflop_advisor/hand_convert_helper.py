@@ -241,9 +241,9 @@ def test():
     #print(sort_monker_2_hand("(QA)(3A)"))
     #replace_monker_2_hands("/media/johann/MONKER/monker-beta/ranges/Omaha/6-way/40bb/0.0.rng")
 
-    #replace_all_monker_2_files("/home/johann/monker-beta/ranges/Omaha5/6-way/100bb/")
+    replace_all_monker_2_files("/home/johann/monker-beta/ranges/Omaha5/6-way/100bb/")
 
-    move_plo5_postflop_file("/home/johann/monker-beta/ranges","CHECK","CHECK.csv")
+    #move_plo5_postflop_file("/home/johann/monker-beta/ranges","CHECK","CHECK.csv")
     #move_plo5_postflop_file("/home/johann/monker-beta/ranges","BET75","BET75.csv")
 if (__name__ == '__main__'):
     test()
