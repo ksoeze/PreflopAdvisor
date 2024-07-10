@@ -1,5 +1,4 @@
 include preflop_advisor/config.ini
 include README.org
-include README.pdf
 include LICENSE
 include requirements.txt

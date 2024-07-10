@@ -1,5 +1,8 @@
 import setuptools
+import os 
 
+with open('requirements.txt') as f:
+    required = f.read().splitlines()
 
 setuptools.setup(
     name='preflop_advisor',
@@ -8,7 +11,7 @@ setuptools.setup(
     author='ksoeze',
     packages=setuptools.find_packages(),
     include_package_data=True,
-    
+    install_requires=required, 
     entry_points={
           'console_scripts': [
               'preflop_advisor = preflop_advisor.__main__:main'
